@@ -1,0 +1,38 @@
+# Rust
+target/
+**/*.rs.bk
+*.pdb
+Cargo.lock
+
+# Fuzz testing artifacts
+**/fuzz/target/
+**/fuzz/corpus/
+**/fuzz/artifacts/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# WASM
+**/pkg-node/
+**/pkg/
+wasm-pack.log
+*.wasm
+
+# Test artifacts
+*.profraw
+*.profdata
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log

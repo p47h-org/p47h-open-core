@@ -1,0 +1,52 @@
+[package]
+name = "p47h-engine"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Core engine for p47h governance - pure library, no WASM artifact"
+
+[lib]
+crate-type = ["rlib"]
+
+[dependencies]
+# --- WORKSPACE CRATES ---
+core-policy = { workspace = true }
+core-identity = { workspace = true }
+
+
+# --- WASM BINDINGS ---
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"
+
+# --- SERIALIZATION ---
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+
+# --- CRYPTO ---
+rand = { workspace = true }
+hex = { workspace = true }
+argon2 = { version = "0.5", features = ["std"] }
+ed25519-dalek = { workspace = true }
+
+secrecy = { version = "0.8", features = ["serde"] }
+chacha20poly1305 = { workspace = true }
+
+# --- UTILITIES ---
+console_error_panic_hook = { version = "0.1", optional = true }
+wee_alloc = { version = "0.4", optional = true }
+toml = { version = "0.8", default-features = false, features = ["parse"] }
+web-sys = { version = "0.3", features = ["Window", "Performance", "console"] }
+js-sys = "0.3"
+getrandom = { version = "0.2", features = ["js"] }
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[features]
+default = ["console_error_panic_hook"]
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false

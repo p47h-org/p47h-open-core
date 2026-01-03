@@ -1,0 +1,35 @@
+[package]
+name = "core-policy"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Pure RBAC/ABAC policy engine core (zero crypto/network dependencies)"
+keywords = ["rbac", "abac", "authorization", "policy", "access-control"]
+categories = ["authentication", "cryptography"]
+
+[dependencies]
+# Serialization
+serde = { workspace = true, features = ["derive"] }
+toml = { workspace = true, default-features = false, features = ["parse", "display"] }
+
+# Error handling
+# thiserror = { workspace = true }
+
+[dev-dependencies]
+# Testing
+proptest = "1.0"
+criterion = "0.5"
+
+[[bench]]
+name = "policy_bench"
+harness = false
+
+[[bench]]
+name = "path_bench"
+harness = false
+
+[features]
+default = []

@@ -1,0 +1,28 @@
+[package]
+name = "p47h-wasm-oss"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Open Source WASM bindings for p47h governance engine (Apache-2.0)"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# --- ENGINE (Pure library) ---
+p47h-engine = { workspace = true }
+
+# --- WASM BINDINGS ---
+wasm-bindgen = "0.2"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[features]
+default = []
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = false

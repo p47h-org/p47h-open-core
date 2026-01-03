@@ -1,0 +1,105 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/core-identity",
+    "crates/core-policy",
+    "crates/app-if-ipc",
+    "crates/app-utils",
+    "crates/p47h-engine",     # core engine (pure rlib)
+    "crates/p47h-wasm-oss",   # OSS WASM wrapper (cdylib)
+    "crates/cli",
+]
+
+# Root package - facade crate for unified exports
+[package]
+name = "p47h-open-core"
+version = "0.10.0"
+edition = "2021"
+authors = ["P47H Team <support@p47h.com>"]
+license = "Apache-2.0"
+repository = "https://github.com/p47h-org/p47h-open-core"
+homepage = "https://p47h.com"
+documentation = "https://docs.rs/p47h-open-core"
+description = "Cryptographic primitives and policy engine for secure identity management"
+readme = "README.md"
+keywords = ["cryptography", "ed25519", "identity", "authorization", "wasm"]
+categories = ["cryptography", "authentication", "wasm"]
+
+[lib]
+path = "src/lib.rs"
+
+[[example]]
+name = "simple_auth_flow"
+path = "examples/simple_auth_flow.rs"
+
+[dependencies]
+# Re-export these crates for unified API
+core-identity = { path = "crates/core-identity", version = "0.10.0" }
+core-policy = { path = "crates/core-policy", version = "0.10.0" }
+p47h-engine = { path = "crates/p47h-engine", version = "0.10.0" }
+
+# For examples
+rand = { workspace = true }
+hex = { workspace = true }
+
+[workspace.package]
+version = "0.10.0"
+edition = "2021"
+rust-version = "1.85"
+authors = ["p47h Team"]
+license = "Apache-2.0"
+repository = "https://github.com/p47h-org/p47h-open-core"
+homepage = "https://p47h.com"
+
+[workspace.dependencies]
+# --- INNER LAYERS (Relative paths) ---
+core-identity = { path = "crates/core-identity", version = "0.10.0" }
+core-policy = { path = "crates/core-policy", version = "0.10.0" }
+app-if-ipc = { path = "crates/app-if-ipc", version = "0.10.0" }
+app-utils = { path = "crates/app-utils", version = "0.10.0" }
+p47h-engine = { path = "crates/p47h-engine", version = "0.10.0" }
+
+# --- CRYPTOGRAPHY ---
+ed25519-dalek = { version = "2.1", default-features = false, features = ["alloc", "zeroize", "rand_core"] }
+rand = { version = "0.8.5", default-features = false, features = ["std", "std_rng"] }
+rand_core = { version = "0.6", default-features = false }
+sha2 = { version = "0.10", default-features = false }
+blake3 = { version = "1.5", default-features = false }
+zeroize = { version = "1.8", features = ["derive"] }
+argon2 = { version = "0.5", default-features = false, features = ["password-hash"] }
+chacha20poly1305 = { version = "0.10", default-features = false, features = ["alloc"] }
+hkdf = { version = "0.12", default-features = false }
+
+# --- ASYNC RUNTIME ---
+tokio = { version = "1", features = ["sync", "macros", "rt", "io-util", "time"] }
+
+# --- SERIALIZATION ---
+serde = { version = "1.0", default-features = false, features = ["derive", "alloc"] }
+serde_json = { version = "1.0", default-features = false, features = ["alloc"] }
+toml = { version = "0.8", default-features = false, features = ["parse", "display"] }
+bincode = { version = "1.3" }
+serde_yaml = "0.9"
+
+# --- UTILS ---
+clap = { version = "4.5", features = ["derive", "cargo"] }
+async-trait = "0.1"
+thiserror = { version = "1.0", default-features = false }
+anyhow = { version = "1.0", default-features = false }
+getrandom = { version = "0.2", features = ["js"] }
+hex = "0.4"
+
+[profile.release]
+opt-level = "z"       # Optimize for size
+strip = true          # Remove debug symbols
+lto = true            # Link-time optimization
+codegen-units = 1     # Maximum optimization
+panic = "abort"       # Smaller binary
+
+# Specific profile for WASM builds with maximum optimization
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

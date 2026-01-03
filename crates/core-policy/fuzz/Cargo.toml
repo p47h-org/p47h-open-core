@@ -1,0 +1,43 @@
+[package]
+name = "core-policy-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+arbitrary = { version = "1", features = ["derive"] }
+
+[dependencies.core-policy]
+path = ".."
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "fuzz_path_pattern"
+path = "fuzz_targets/fuzz_path_pattern.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_policy_from_toml"
+path = "fuzz_targets/fuzz_policy_from_toml.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_wildcard_match"
+path = "fuzz_targets/fuzz_wildcard_match.rs"
+test = false
+doc = false
+bench = false

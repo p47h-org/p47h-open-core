@@ -1,0 +1,26 @@
+# P47H Open Core - Code Owners
+# ============================
+# These owners will be requested for review when someone opens a PR
+# that modifies matching paths.
+
+# Default owners for everything
+* @p47h/core-team
+
+# Cryptographic core - requires security review
+/crates/core-identity/ @p47h/security-team @p47h/core-team
+/crates/core-crypto/ @p47h/security-team @p47h/core-team
+/crates/core-policy/ @p47h/security-team @p47h/core-team
+
+# WASM bindings - affects SDK consumers
+/crates/wasm/ @p47h/core-team @p47h/sdk-team
+
+# CLI tool
+/crates/cli/ @p47h/core-team
+
+# Documentation and examples
+/examples/ @p47h/docs-team
+*.md @p47h/docs-team
+
+# CI/CD and security configuration
+/.github/ @p47h/core-team @p47h/security-team
+/Cargo.toml @p47h/core-team

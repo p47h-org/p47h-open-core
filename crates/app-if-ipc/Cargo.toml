@@ -1,0 +1,14 @@
+[package]
+name = "app-if-ipc"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "IPC interfaces for P47H components"
+keywords = ["ipc", "security", "authentication", "traits"]
+
+[dependencies]
+thiserror = { workspace = true }
+serde = { workspace = true }
