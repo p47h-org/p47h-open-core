@@ -94,13 +94,13 @@ jobs:
 
       - name: Build WASM
         run: |
-          cd crates/p47h-wasm-core
+          cd crates/p47h-wasm-oss
           wasm-pack build --target web --release
 
       - name: Check WASM size
         run: |
-          cd crates/p47h-wasm-core/pkg
-          SIZE=$(stat -f%z p47h_wasm_core_bg.wasm || stat -c%s p47h_wasm_core_bg.wasm)
+          cd crates/p47h-wasm-oss/pkg
+          SIZE=$(stat -f%z p47h_wasm_oss_bg.wasm || stat -c%s p47h_wasm_oss_bg.wasm)
           echo "WASM size: $SIZE bytes"
           if [ $SIZE -gt 204800 ]; then
             echo "ERROR: WASM bundle exceeds 200KB limit"

@@ -15,11 +15,11 @@
 //!
 //! ```rust,no_run
 //! use p47h_open_core::identity::Identity;
-//! use p47h_open_core::policy::Policy;
 //!
 //! // Generate a new cryptographic identity
-//! let identity = Identity::generate();
-//! println!("DID: {}", identity.did());
+//! let mut rng = rand::thread_rng();
+//! let identity = Identity::generate(&mut rng).expect("Failed to generate identity");
+//! println!("Public key hash: {:?}", identity.public_key_hash());
 //! ```
 //!
 //! ## Architecture
