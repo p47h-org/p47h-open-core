@@ -9,6 +9,9 @@ Cargo.lock
 **/fuzz/corpus/
 **/fuzz/artifacts/
 
+# Local scripts
+scripts/
+
 # IDE
 .idea/
 .vscode/

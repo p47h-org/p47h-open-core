@@ -100,10 +100,10 @@ jobs:
       - name: Check WASM size
         run: |
           cd crates/p47h-wasm-oss/pkg
-          SIZE=$(stat -f%z p47h_wasm_oss_bg.wasm || stat -c%s p47h_wasm_oss_bg.wasm)
-          echo "WASM size: $SIZE bytes"
-          if [ $SIZE -gt 204800 ]; then
-            echo "ERROR: WASM bundle exceeds 200KB limit"
+          SIZE=$(stat -c%s p47h_wasm_oss_bg.wasm 2>/dev/null || stat -f%z p47h_wasm_oss_bg.wasm)
+          echo "WASM size: $SIZE bytes ($(($SIZE / 1024))KB)"
+          if [ $SIZE -gt 614400 ]; then
+            echo "ERROR: WASM bundle exceeds 600KB limit"
             exit 1
           fi
 

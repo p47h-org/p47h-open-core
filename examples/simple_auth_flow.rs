@@ -101,7 +101,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Bob deleting from /shared/ - should be ALLOWED (Rule 3, Action::All)
         (&bob_id, Action::Delete, "/shared/old-file.txt", true),
         // Unknown user - should be DENIED (no rules match)
-        (&"unknown-user".to_string(), Action::Read, "/data/file.txt", false),
+        (
+            &"unknown-user".to_string(),
+            Action::Read,
+            "/data/file.txt",
+            false,
+        ),
     ];
 
     println!("Evaluating access requests:");
@@ -113,7 +118,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         // Verify our expectations match the actual result
         let status = if allowed { "ALLOWED" } else { "DENIED" };
-        let check = if allowed == expected { "OK" } else { "MISMATCH" };
+        let check = if allowed == expected {
+            "OK"
+        } else {
+            "MISMATCH"
+        };
 
         println!(
             "  {} {:?} {} -> {} [{}]",
