@@ -1,0 +1,39 @@
+[package]
+name = "p47h-engine-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+arbitrary = { version = "1", features = ["derive"] }
+
+[dependencies.p47h-engine]
+path = ".."
+
+[dependencies.core-policy]
+path = "../../core-policy"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "fuzz_vault_decrypt"
+path = "fuzz_targets/fuzz_vault_decrypt.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "fuzz_resource_parser"
+path = "fuzz_targets/fuzz_resource_parser.rs"
+test = false
+doc = false
+bench = false

@@ -17,7 +17,8 @@ mod types;
 mod utils;
 mod validation;
 
-mod vault;
+/// Vault cryptographic operations (encryption/decryption)
+pub mod vault;
 mod wrappers;
 
 #[allow(unused_imports)]

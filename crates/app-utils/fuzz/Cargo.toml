@@ -1,0 +1,32 @@
+[package]
+name = "app-utils-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+arbitrary = { version = "1", features = ["derive"] }
+
+[dependencies.app-utils]
+path = ".."
+
+[dependencies.core-policy]
+path = "../../core-policy"
+
+# Prevent this from interfering with workspaces
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "fuzz_yaml_policy"
+path = "fuzz_targets/fuzz_yaml_policy.rs"
+test = false
+doc = false
+bench = false

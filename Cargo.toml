@@ -13,7 +13,7 @@ members = [
 # Root package - facade crate for unified exports
 [package]
 name = "p47h-open-core"
-version = "0.10.0"
+version = "0.10.1"
 edition = "2021"
 authors = ["P47H Team <support@p47h.com>"]
 license = "Apache-2.0"
@@ -34,16 +34,16 @@ path = "examples/simple_auth_flow.rs"
 
 [dependencies]
 # Re-export these crates for unified API
-core-identity = { path = "crates/core-identity", version = "0.10.0" }
-core-policy = { path = "crates/core-policy", version = "0.10.0" }
-p47h-engine = { path = "crates/p47h-engine", version = "0.10.0" }
+core-identity = { path = "crates/core-identity", version = "0.10.1" }
+core-policy = { path = "crates/core-policy", version = "0.10.1" }
+p47h-engine = { path = "crates/p47h-engine", version = "0.10.1" }
 
 # For examples
 rand = { workspace = true }
 hex = { workspace = true }
 
 [workspace.package]
-version = "0.10.0"
+version = "0.10.1"
 edition = "2021"
 rust-version = "1.85"
 authors = ["p47h Team"]
@@ -53,11 +53,11 @@ homepage = "https://p47h.com"
 
 [workspace.dependencies]
 # --- INNER LAYERS (Relative paths) ---
-core-identity = { path = "crates/core-identity", version = "0.10.0" }
-core-policy = { path = "crates/core-policy", version = "0.10.0" }
-app-if-ipc = { path = "crates/app-if-ipc", version = "0.10.0" }
-app-utils = { path = "crates/app-utils", version = "0.10.0" }
-p47h-engine = { path = "crates/p47h-engine", version = "0.10.0" }
+core-identity = { path = "crates/core-identity", version = "0.10.1" }
+core-policy = { path = "crates/core-policy", version = "0.10.1" }
+app-if-ipc = { path = "crates/app-if-ipc", version = "0.10.1" }
+app-utils = { path = "crates/app-utils", version = "0.10.1" }
+p47h-engine = { path = "crates/p47h-engine", version = "0.10.1" }
 
 # --- CRYPTOGRAPHY ---
 ed25519-dalek = { version = "2.1", default-features = false, features = ["alloc", "zeroize", "rand_core"] }

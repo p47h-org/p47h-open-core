@@ -41,3 +41,10 @@ path = "fuzz_targets/fuzz_wildcard_match.rs"
 test = false
 doc = false
 bench = false
+
+[[bin]]
+name = "fuzz_context_expr"
+path = "fuzz_targets/fuzz_context_expr.rs"
+test = false
+doc = false
+bench = false

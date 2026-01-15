@@ -36,7 +36,8 @@ chacha20poly1305 = { workspace = true }
 
 # --- UTILITIES ---
 console_error_panic_hook = { version = "0.1", optional = true }
-wee_alloc = { version = "0.4", optional = true }
+# wee_alloc REMOVED: RUSTSEC-2022-0054 - unmaintained with memory leaks
+# Rust's default allocator is now efficient for WASM
 toml = { version = "0.8", default-features = false, features = ["parse"] }
 web-sys = { version = "0.3", features = ["Window", "Performance", "console"] }
 js-sys = "0.3"

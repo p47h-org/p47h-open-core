@@ -3,8 +3,6 @@
 The cryptographic primitive layer for the P47H ecosystem.
 
 [![Build Status](https://img.shields.io/github/actions/workflow/status/p47h-org/p47h-open-core/ci.yml?branch=main)](https://github.com/p47h-org/p47h-open-core/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/p47h-org/p47h-open-core)](https://codecov.io/gh/p47h-org/p47h-open-core)
-[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](./LICENSE)
 [![Crates.io](https://img.shields.io/crates/v/p47h-open-core)](https://crates.io/crates/p47h-open-core)
 
 ---

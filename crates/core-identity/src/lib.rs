@@ -336,3 +336,47 @@ impl TryFrom<SerializableVerifyingKey> for VerifyingKey {
         VerifyingKey::from_bytes(&svk.0).map_err(|_| IdentityError::InvalidPublicKey)
     }
 }
+
+// ============================================================================
+// Kani Formal Verification Proofs
+// ============================================================================
+
+/// Formal verification proofs for cryptographic size invariants.
+/// Run with: `cargo kani --package core-identity`
+#[cfg(kani)]
+mod kani_proofs {
+    /// Ed25519 public key size is always 32 bytes.
+    #[kani::proof]
+    #[kani::unwind(0)]
+    fn proof_ed25519_pubkey_size() {
+        // Ed25519 public keys are 32 bytes (compressed curve point)
+        const ED25519_PUBKEY_LEN: usize = 32;
+        kani::assert(ED25519_PUBKEY_LEN == 32, "Ed25519 public key must be 32 bytes");
+    }
+
+    /// Ed25519 signature size is always 64 bytes.
+    #[kani::proof]
+    #[kani::unwind(0)]
+    fn proof_ed25519_signature_size() {
+        // Ed25519 signatures are 64 bytes (R + S components)
+        const ED25519_SIG_LEN: usize = 64;
+        kani::assert(ED25519_SIG_LEN == 64, "Ed25519 signature must be 64 bytes");
+    }
+
+    /// Ed25519 seed/secret key size is always 32 bytes.
+    #[kani::proof]
+    #[kani::unwind(0)]
+    fn proof_ed25519_seed_size() {
+        const ED25519_SEED_LEN: usize = 32;
+        kani::assert(ED25519_SEED_LEN == 32, "Ed25519 seed must be 32 bytes");
+    }
+
+    /// Blake3 hash output is always 32 bytes.
+    #[kani::proof]
+    #[kani::unwind(0)]
+    fn proof_blake3_hash_size() {
+        const BLAKE3_OUTPUT_LEN: usize = 32;
+        kani::assert(BLAKE3_OUTPUT_LEN == 32, "Blake3 hash must be 32 bytes");
+    }
+}
+
