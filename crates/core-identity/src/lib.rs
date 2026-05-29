@@ -40,10 +40,13 @@
 extern crate alloc;
 
 mod error;
+#[cfg(feature = "frost")]
+pub mod frost;
 pub mod hash;
 pub mod trust_anchor;
 
 pub use error::{IdentityError, Result};
+#[allow(deprecated)]
 pub use trust_anchor::{
     Ed25519SingleSigner, Ed25519Verifier, FrostThresholdSigner, TrustAnchorSigner,
     TrustAnchorVerifier,

@@ -99,31 +99,21 @@ impl TrustAnchorVerifier for Ed25519Verifier {
     }
 }
 
-/// Placeholder for FROST threshold signer (H1 implementation).
-///
-/// Parameters:
-/// - `t`: minimum number of signers required
-/// - `n`: total number of key shares
-///
-/// The actual implementation requires the `frost-ed25519` crate
-/// (Zcash Foundation) and a DKG ceremony to generate key shares.
+/// Deprecated placeholder — use `frost::FrostLocalSigner` (behind `frost` feature) instead.
+#[deprecated(since = "0.10.3", note = "Use frost::FrostLocalSigner with the `frost` feature flag")]
 pub struct FrostThresholdSigner {
-    /// Minimum signers required for a valid signature.
     pub t: u16,
-    /// Total number of key share holders.
     pub n: u16,
 }
 
-/// **Note**: This synchronous impl is a placeholder. Real FROST signing
-/// is a multi-round interactive protocol that will require a redesigned
-/// async/stateful API in H1. See `docs/threshold-signing.md` §5.
+#[allow(deprecated)]
 impl TrustAnchorSigner for FrostThresholdSigner {
     fn sign(&self, _message: &[u8]) -> Result<Signature> {
-        unimplemented!("FROST threshold signing not yet implemented (planned for H1)")
+        unimplemented!("Use frost::FrostLocalSigner with the `frost` feature flag")
     }
 
     fn verifying_key(&self) -> VerifyingKey {
-        unimplemented!("FROST group key not yet available (planned for H1)")
+        unimplemented!("Use frost::FrostLocalSigner with the `frost` feature flag")
     }
 }
 

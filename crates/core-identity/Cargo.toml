@@ -13,6 +13,7 @@ categories = ["cryptography", "no-std"]
 [features]
 default = ["std"]
 std = ["secrecy"]
+frost = ["frost-ed25519", "std", "rand"]
 
 [dependencies]
 # --- CRYPTOGRAPHY ---
@@ -26,6 +27,10 @@ serde = { workspace = true, features = ["derive", "alloc"] }
 
 # --- SECURITY (std-only) ---
 secrecy = { version = "0.8", features = ["serde"], optional = true }
+
+# --- THRESHOLD SIGNING (optional) ---
+frost-ed25519 = { version = "3.0", optional = true }
+rand = { workspace = true, optional = true }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 getrandom = { version = "0.2", features = ["js"] }

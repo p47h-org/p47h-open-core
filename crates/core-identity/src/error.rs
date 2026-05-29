@@ -13,6 +13,8 @@ pub enum IdentityError {
 
     #[allow(dead_code)]
     InvalidKey(String),
+
+    InvalidState(String),
 }
 
 impl fmt::Display for IdentityError {
@@ -22,6 +24,7 @@ impl fmt::Display for IdentityError {
             Self::InvalidSignature => write!(f, "Invalid signature"),
             Self::InvalidPublicKey => write!(f, "Invalid public key"),
             Self::InvalidKey(msg) => write!(f, "Invalid key: {msg}"),
+            Self::InvalidState(msg) => write!(f, "Invalid state: {msg}"),
         }
     }
 }
