@@ -41,8 +41,13 @@ extern crate alloc;
 
 mod error;
 pub mod hash;
+pub mod trust_anchor;
 
 pub use error::{IdentityError, Result};
+pub use trust_anchor::{
+    Ed25519SingleSigner, Ed25519Verifier, FrostThresholdSigner, TrustAnchorSigner,
+    TrustAnchorVerifier,
+};
 
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
 use serde::{Deserialize, Serialize};
@@ -348,7 +353,10 @@ mod kani_proofs {
     fn proof_ed25519_pubkey_size() {
         // Ed25519 public keys are 32 bytes (compressed curve point)
         const ED25519_PUBKEY_LEN: usize = 32;
-        kani::assert(ED25519_PUBKEY_LEN == 32, "Ed25519 public key must be 32 bytes");
+        kani::assert(
+            ED25519_PUBKEY_LEN == 32,
+            "Ed25519 public key must be 32 bytes",
+        );
     }
 
     /// Ed25519 signature size is always 64 bytes.
@@ -376,4 +384,3 @@ mod kani_proofs {
         kani::assert(BLAKE3_OUTPUT_LEN == 32, "Blake3 hash must be 32 bytes");
     }
 }
-

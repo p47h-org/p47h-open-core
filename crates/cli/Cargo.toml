@@ -8,6 +8,9 @@ license.workspace = true
 repository.workspace = true
 description = "CLI tool for P47H policy validation and DID management"
 
+[lints]
+workspace = true
+
 [[bin]]
 name = "p47h"
 path = "src/main.rs"

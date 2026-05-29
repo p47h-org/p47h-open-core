@@ -88,6 +88,9 @@ anyhow = { version = "1.0", default-features = false }
 getrandom = { version = "0.2", features = ["js"] }
 hex = "0.4"
 
+[workspace.lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(kani)'] }
+
 [profile.release]
 opt-level = "z"       # Optimize for size
 strip = true          # Remove debug symbols

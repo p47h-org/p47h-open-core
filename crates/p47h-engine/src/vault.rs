@@ -36,7 +36,12 @@ pub enum VaultError {
     /// Encryption failed
     EncryptionError(String),
     /// Vault blob is too short to be valid
-    TooShort { actual: usize, minimum: usize },
+    TooShort {
+        /// Actual size in bytes
+        actual: usize,
+        /// Minimum required size in bytes
+        minimum: usize,
+    },
     /// Magic bytes don't match
     InvalidMagic,
     /// Decryption failed (wrong password or corrupted data)
@@ -50,7 +55,11 @@ impl std::fmt::Display for VaultError {
             VaultError::KeyDerivationError(msg) => write!(f, "Key derivation failed: {}", msg),
             VaultError::EncryptionError(msg) => write!(f, "Encryption failed: {}", msg),
             VaultError::TooShort { actual, minimum } => {
-                write!(f, "Invalid vault: too short ({} bytes, minimum {})", actual, minimum)
+                write!(
+                    f,
+                    "Invalid vault: too short ({} bytes, minimum {})",
+                    actual, minimum
+                )
             }
             VaultError::InvalidMagic => write!(f, "Invalid vault: wrong magic bytes"),
             VaultError::DecryptionFailed => {
@@ -73,7 +82,7 @@ impl From<VaultError> for JsValue {
 // ============================================================================
 
 /// Derives a key from password and salt using Argon2id.
-/// 
+///
 /// This is the pure Rust version without JsValue dependencies.
 pub fn derive_key_inner(password: &str, salt: &[u8]) -> Result<chacha20poly1305::Key, VaultError> {
     let mut output_key = [0u8; 32];
@@ -96,7 +105,7 @@ pub fn derive_key_inner(password: &str, salt: &[u8]) -> Result<chacha20poly1305:
 }
 
 /// Encrypts data with a provided salt and nonce (for testing/fuzzing).
-/// 
+///
 /// In production, use `encrypt_vault_inner` which generates random salt/nonce.
 pub fn encrypt_vault_with_params(
     data: &[u8],
@@ -112,7 +121,8 @@ pub fn encrypt_vault_with_params(
         .encrypt(nonce_obj, data)
         .map_err(|e| VaultError::EncryptionError(e.to_string()))?;
 
-    let mut result = Vec::with_capacity(MAGIC_BYTES.len() + SALT_LEN + NONCE_LEN + ciphertext.len());
+    let mut result =
+        Vec::with_capacity(MAGIC_BYTES.len() + SALT_LEN + NONCE_LEN + ciphertext.len());
     result.extend_from_slice(MAGIC_BYTES);
     result.extend_from_slice(salt);
     result.extend_from_slice(nonce);
@@ -179,12 +189,10 @@ impl VaultCrypto {
     #[wasm_bindgen]
     pub fn encrypt_vault(data: &[u8], password: &str) -> Result<Vec<u8>, JsValue> {
         let mut salt = [0u8; SALT_LEN];
-        getrandom::getrandom(&mut salt)
-            .map_err(|e| VaultError::RngError(e.to_string()))?;
+        getrandom::getrandom(&mut salt).map_err(|e| VaultError::RngError(e.to_string()))?;
 
         let mut nonce = [0u8; NONCE_LEN];
-        getrandom::getrandom(&mut nonce)
-            .map_err(|e| VaultError::RngError(e.to_string()))?;
+        getrandom::getrandom(&mut nonce).map_err(|e| VaultError::RngError(e.to_string()))?;
 
         encrypt_vault_with_params(data, password, &salt, &nonce).map_err(Into::into)
     }
@@ -234,7 +242,7 @@ mod tests {
     fn test_invalid_magic() {
         let mut blob = vec![0u8; MIN_VAULT_LEN + 16];
         blob[..5].copy_from_slice(b"WRONG");
-        
+
         let result = decrypt_vault_inner(&blob, "password");
         assert!(matches!(result, Err(VaultError::InvalidMagic)));
     }
@@ -268,7 +276,10 @@ mod kani_proofs {
     #[kani::unwind(0)]
     fn proof_min_vault_len_invariant() {
         let expected = MAGIC_BYTES.len() + SALT_LEN + NONCE_LEN;
-        kani::assert(MIN_VAULT_LEN == expected, "MIN_VAULT_LEN must equal components sum");
+        kani::assert(
+            MIN_VAULT_LEN == expected,
+            "MIN_VAULT_LEN must equal components sum",
+        );
     }
 
     /// Verify XChaCha20 nonce size is 24 bytes.
@@ -296,4 +307,3 @@ mod kani_proofs {
         kani::assert(is_too_short, "Short blobs must fail validation");
     }
 }
-

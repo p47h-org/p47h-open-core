@@ -9,7 +9,7 @@
 //! 4. Evaluation is deterministic (same input = same output)
 //! 5. Boolean logic is correct (AND, OR, NOT semantics)
 
-use core_policy::{ContextExpr, CompareOp, MAX_EXPR_DEPTH, MAX_EXPR_LENGTH};
+use core_policy::{CompareOp, ContextExpr, MAX_EXPR_DEPTH, MAX_EXPR_LENGTH};
 use proptest::prelude::*;
 use std::collections::BTreeMap;
 
@@ -25,7 +25,7 @@ proptest! {
     fn prop_max_length_enforced(extra_len in 1usize..1000) {
         let input = "a".repeat(MAX_EXPR_LENGTH + extra_len);
         let result = ContextExpr::parse(&input);
-        
+
         prop_assert!(
             result.is_err(),
             "Input of length {} should be rejected (max: {})",
@@ -39,7 +39,7 @@ proptest! {
     fn prop_within_length_allowed(len in 1usize..=MAX_EXPR_LENGTH) {
         let input = "a".repeat(len);
         let result = ContextExpr::parse(&input);
-        
+
         // May fail for syntax, but NOT for length
         // We can't easily check the error type, but we verify no panic
         let _ = result;
@@ -98,9 +98,9 @@ proptest! {
 
 fn arbitrary_context() -> impl Strategy<Value = BTreeMap<String, String>> {
     prop::collection::btree_map(
-        "[a-z]{1,10}",      // keys
+        "[a-z]{1,10}",       // keys
         "[a-zA-Z0-9]{1,20}", // values
-        0..10               // size
+        0..10,               // size
     )
 }
 
@@ -118,11 +118,11 @@ proptest! {
             let r1 = expr.evaluate(&ctx, 0);
             let r2 = expr.evaluate(&ctx, 0);
             let r3 = expr.evaluate(&ctx, 0);
-            
+
             // All three should have the same success/failure status
             prop_assert!(r1.is_ok() == r2.is_ok(), "Determinism: same ok status");
             prop_assert!(r2.is_ok() == r3.is_ok(), "Determinism: same ok status");
-            
+
             // If successful, values must match
             if let (Ok(v1), Ok(v2), Ok(v3)) = (r1, r2, r3) {
                 prop_assert_eq!(v1, v2, "Evaluation must be deterministic");
@@ -140,7 +140,7 @@ proptest! {
         if let Ok(expr) = ContextExpr::parse(&expr_str) {
             let at_zero = expr.evaluate(&ctx, 0);
             let at_one = expr.evaluate(&ctx, 1);
-            
+
             // Both should succeed for simple expressions
             if at_zero.is_ok() && at_one.is_ok() {
                 prop_assert_eq!(
@@ -175,7 +175,7 @@ proptest! {
         let expr = make_nested_expr(MAX_EXPR_DEPTH + extra_depth);
         let ctx = BTreeMap::new();
         let result = expr.evaluate(&ctx, 0);
-        
+
         prop_assert!(
             result.is_err(),
             "Expression with depth {} should fail (max: {})",
@@ -190,7 +190,7 @@ proptest! {
         let expr = make_nested_expr(depth);
         let ctx = BTreeMap::new();
         let result = expr.evaluate(&ctx, 0);
-        
+
         // Should succeed (NOT NOT NOT ... TRUE = TRUE or FALSE)
         prop_assert!(
             result.is_ok(),
@@ -249,10 +249,10 @@ proptest! {
     fn prop_double_negation(b in any::<bool>(), ctx in arbitrary_context()) {
         let inner = if b { ContextExpr::True } else { ContextExpr::False };
         let expr = ContextExpr::Not(Box::new(ContextExpr::Not(Box::new(inner.clone()))));
-        
+
         let original = inner.evaluate(&ctx, 0).unwrap();
         let double_neg = expr.evaluate(&ctx, 0).unwrap();
-        
+
         prop_assert_eq!(original, double_neg, "NOT NOT x must equal x");
     }
 
@@ -341,19 +341,19 @@ proptest! {
     fn prop_de_morgan_and(a in any::<bool>(), b in any::<bool>(), ctx in arbitrary_context()) {
         let a_expr = if a { ContextExpr::True } else { ContextExpr::False };
         let b_expr = if b { ContextExpr::True } else { ContextExpr::False };
-        
+
         // NOT (A AND B)
         let left = ContextExpr::Not(Box::new(ContextExpr::And(
             Box::new(a_expr.clone()),
             Box::new(b_expr.clone())
         )));
-        
+
         // (NOT A) OR (NOT B)
         let right = ContextExpr::Or(
             Box::new(ContextExpr::Not(Box::new(a_expr))),
             Box::new(ContextExpr::Not(Box::new(b_expr)))
         );
-        
+
         prop_assert_eq!(
             left.evaluate(&ctx, 0).unwrap(),
             right.evaluate(&ctx, 0).unwrap(),
@@ -366,19 +366,19 @@ proptest! {
     fn prop_de_morgan_or(a in any::<bool>(), b in any::<bool>(), ctx in arbitrary_context()) {
         let a_expr = if a { ContextExpr::True } else { ContextExpr::False };
         let b_expr = if b { ContextExpr::True } else { ContextExpr::False };
-        
+
         // NOT (A OR B)
         let left = ContextExpr::Not(Box::new(ContextExpr::Or(
             Box::new(a_expr.clone()),
             Box::new(b_expr.clone())
         )));
-        
+
         // (NOT A) AND (NOT B)
         let right = ContextExpr::And(
             Box::new(ContextExpr::Not(Box::new(a_expr))),
             Box::new(ContextExpr::Not(Box::new(b_expr)))
         );
-        
+
         prop_assert_eq!(
             left.evaluate(&ctx, 0).unwrap(),
             right.evaluate(&ctx, 0).unwrap(),
@@ -399,13 +399,13 @@ proptest! {
     fn prop_compare_equal_match(value in "[a-z]{1,10}") {
         let mut ctx = BTreeMap::new();
         ctx.insert("key".to_string(), value.clone());
-        
+
         let expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::Equal,
             value: value.clone(),
         };
-        
+
         prop_assert_eq!(expr.evaluate(&ctx, 0).unwrap(), true);
     }
 
@@ -417,13 +417,13 @@ proptest! {
     ) {
         let mut ctx = BTreeMap::new();
         ctx.insert("key".to_string(), stored);
-        
+
         let expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::Equal,
             value: compared,
         };
-        
+
         prop_assert_eq!(expr.evaluate(&ctx, 0).unwrap(), false);
     }
 
@@ -435,22 +435,22 @@ proptest! {
     ) {
         let mut ctx = BTreeMap::new();
         ctx.insert("key".to_string(), stored.clone());
-        
+
         let eq_expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::Equal,
             value: compared.clone(),
         };
-        
+
         let neq_expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::NotEqual,
             value: compared,
         };
-        
+
         let eq_result = eq_expr.evaluate(&ctx, 0).unwrap();
         let neq_result = neq_expr.evaluate(&ctx, 0).unwrap();
-        
+
         prop_assert_eq!(eq_result, !neq_result, "!= must be inverse of ==");
     }
 
@@ -458,13 +458,13 @@ proptest! {
     #[test]
     fn prop_missing_key_false(value in "[a-z]{1,10}") {
         let ctx = BTreeMap::new(); // Empty context
-        
+
         let expr = ContextExpr::Compare {
             key: "nonexistent".to_string(),
             op: CompareOp::Equal,
             value,
         };
-        
+
         prop_assert_eq!(expr.evaluate(&ctx, 0).unwrap(), false);
     }
 
@@ -477,10 +477,10 @@ proptest! {
     ) {
         let mut ctx = BTreeMap::new();
         ctx.insert(key.clone(), value);
-        
+
         let check_key = if check_existing { key } else { "other".to_string() };
         let expr = ContextExpr::HasAttribute(check_key.clone());
-        
+
         let expected = ctx.contains_key(&check_key);
         prop_assert_eq!(expr.evaluate(&ctx, 0).unwrap(), expected);
     }
@@ -501,14 +501,14 @@ proptest! {
     ) {
         let mut ctx = BTreeMap::new();
         ctx.insert("key".to_string(), stored.clone());
-        
+
         // stored < compared should be true (first half < second half)
         let expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::LessThan,
             value: compared.clone(),
         };
-        
+
         // This should be true since a-m < n-z lexicographically
         let result = expr.evaluate(&ctx, 0).unwrap();
         let expected = stored < compared;
@@ -523,13 +523,13 @@ proptest! {
     ) {
         let mut ctx = BTreeMap::new();
         ctx.insert("key".to_string(), stored.clone());
-        
+
         let expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::GreaterThan,
             value: compared.clone(),
         };
-        
+
         let result = expr.evaluate(&ctx, 0).unwrap();
         let expected = stored > compared;
         prop_assert_eq!(result, expected);
@@ -540,13 +540,13 @@ proptest! {
     fn prop_lte_includes_equal(value in "[a-z]{1,5}") {
         let mut ctx = BTreeMap::new();
         ctx.insert("key".to_string(), value.clone());
-        
+
         let expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::LessThanOrEqual,
             value: value.clone(),
         };
-        
+
         // value <= value should always be true
         prop_assert_eq!(expr.evaluate(&ctx, 0).unwrap(), true);
     }
@@ -556,13 +556,13 @@ proptest! {
     fn prop_gte_includes_equal(value in "[a-z]{1,5}") {
         let mut ctx = BTreeMap::new();
         ctx.insert("key".to_string(), value.clone());
-        
+
         let expr = ContextExpr::Compare {
             key: "key".to_string(),
             op: CompareOp::GreaterThanOrEqual,
             value: value.clone(),
         };
-        
+
         // value >= value should always be true
         prop_assert_eq!(expr.evaluate(&ctx, 0).unwrap(), true);
     }

@@ -18,6 +18,9 @@ toml = { workspace = true, default-features = false, features = ["parse", "displ
 # Error handling
 # thiserror = { workspace = true }
 
+[lints]
+workspace = true
+
 [dev-dependencies]
 # Testing
 proptest = "1.0"

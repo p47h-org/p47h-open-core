@@ -22,7 +22,7 @@ fn test_deep_nesting_no_crash() {
 
         // Must not panic
         let result = ContextExpr::parse(&expr);
-        
+
         // For very deep nesting, we expect parsing to succeed
         // but evaluation should be limited by MAX_EXPR_DEPTH
         if let Ok(parsed) = result {
@@ -150,13 +150,13 @@ fn test_special_chars_no_crash() {
 #[test]
 fn test_unicode_no_crash() {
     let cases = [
-        "роль == \"админ\"",           // Cyrillic
-        "角色 == \"管理员\"",           // Chinese
-        "🔒 == \"🔑\"",                // Emoji
-        "rôle == \"àdmin\"",           // Accented Latin
-        "役割 == \"管理者\"",           // Japanese
-        "תפקיד == \"מנהל\"",           // Hebrew (RTL)
-        "دور == \"مدير\"",             // Arabic (RTL)
+        "роль == \"админ\"",  // Cyrillic
+        "角色 == \"管理员\"", // Chinese
+        "🔒 == \"🔑\"",       // Emoji
+        "rôle == \"àdmin\"",  // Accented Latin
+        "役割 == \"管理者\"", // Japanese
+        "תפקיד == \"מנהל\"",  // Hebrew (RTL)
+        "دور == \"مدير\"",    // Arabic (RTL)
     ];
 
     for case in cases {
@@ -205,13 +205,13 @@ fn test_malformed_operators_no_crash() {
 #[test]
 fn test_string_literal_edge_cases() {
     let cases = [
-        "role == \"\"",                    // Empty string
-        "role == \"\\\"\"",                // Escaped quote
-        "role == \"\\\\\"",                // Escaped backslash
-        "role == \"a\\\"b\"",              // Quote in middle
-        "role == \"",                      // Unterminated
-        "role == \"admin",                 // Unterminated
-        "role == admin\"",                 // No opening quote
+        "role == \"\"",       // Empty string
+        "role == \"\\\"\"",   // Escaped quote
+        "role == \"\\\\\"",   // Escaped backslash
+        "role == \"a\\\"b\"", // Quote in middle
+        "role == \"",         // Unterminated
+        "role == \"admin",    // Unterminated
+        "role == admin\"",    // No opening quote
     ];
 
     for case in cases {

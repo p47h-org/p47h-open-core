@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.10.2] - 2026-05-29
+
+### Security
+
+- **core-identity**: `#![no_std]` migration — eliminates std dependency for embedded targets
+- **core-identity**: Feature-gated `secrecy` behind `std` feature (default enabled)
+
+### Added
+
+- **core-identity**: `TrustAnchorSigner` / `TrustAnchorVerifier` trait abstraction for pluggable signing backends
+- **core-identity**: `Ed25519SingleSigner` and `Ed25519Verifier` implementations (production path)
+- **core-identity**: `FrostThresholdSigner` placeholder for H1 FROST-Ed25519 threshold signing
+
+### Changed
+
+- **core-identity**: Manual `core::error::Error` impl replaces `thiserror` (MSRV 1.85, `core::error::Error` stable since 1.81)
+- **core-identity**: `rand` moved to dev-dependencies (not needed at runtime)
+- **core-identity**: `getrandom` gated to `wasm32` target only
+- **core-policy**: Added `check-cfg` for `kani` feature gate
+- **p47h-engine**: Added `check-cfg` for `kani` feature gate
+- **p47h-engine**: Added doc comments on `VaultError::TooShort` fields
+
+### Testing Infrastructure
+
+| Test Type | Coverage |
+| ----------- | ---------- |
+| Unit Tests | 277 tests across all crates |
+| no_std Build | `thumbv7em-none-eabi` verified |
+| Kani Proofs | core-identity, core-policy, p47h-engine |
+
 ## [0.10.1] - 2026-01-15
 
 ### Added
