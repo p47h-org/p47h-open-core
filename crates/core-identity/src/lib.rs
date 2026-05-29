@@ -13,7 +13,7 @@
 //! - **Ed25519 Signatures**: NIST-compliant digital signatures
 //! - **Memory Safety**: Automatic zeroization of private keys
 //! - **Blake3 Hashing**: Fast public key hashing for lookups
-//! - **libp2p Integration**: Seamless conversion to libp2p keypairs
+//! - **no_std compatible**: Works on embedded targets with `alloc`
 //!
 //! ## Example
 //!
@@ -36,15 +36,25 @@
 //! # }
 //! ```
 
+#![no_std]
+extern crate alloc;
+
 mod error;
 pub mod hash;
+pub mod trust_anchor;
 
 pub use error::{IdentityError, Result};
+pub use trust_anchor::{
+    Ed25519SingleSigner, Ed25519Verifier, FrostThresholdSigner, TrustAnchorSigner,
+    TrustAnchorVerifier,
+};
 
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
-use secrecy::Secret;
 use serde::{Deserialize, Serialize};
 use zeroize::ZeroizeOnDrop;
+
+#[cfg(feature = "std")]
+use {alloc::vec::Vec, secrecy::Secret};
 
 use rand_core::{CryptoRng, RngCore};
 
@@ -213,16 +223,7 @@ impl Identity {
     /// - Will not appear in logs automatically
     /// - Requires explicit `.expose_secret()` to access
     ///
-    /// Should only be used for:
-    /// - Secure serialization (encrypted keystore)
-    /// - Conversion to libp2p keypair
-    /// - Low-level cryptographic operations
-    ///
-    /// WARNING: Use `.expose_secret()` only when absolutely necessary.
-    /// The exposed bytes should be:
-    /// - Encrypted immediately if stored
-    /// - Zeroized after use
-    /// - Never logged or transmitted unencrypted
+    /// Only available with the `std` feature (default).
     ///
     /// # Example
     ///
@@ -243,6 +244,7 @@ impl Identity {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "std")]
     pub fn signing_key_bytes(&self) -> Secret<Vec<u8>> {
         Secret::new(self.keypair.to_bytes().to_vec())
     }
@@ -351,7 +353,10 @@ mod kani_proofs {
     fn proof_ed25519_pubkey_size() {
         // Ed25519 public keys are 32 bytes (compressed curve point)
         const ED25519_PUBKEY_LEN: usize = 32;
-        kani::assert(ED25519_PUBKEY_LEN == 32, "Ed25519 public key must be 32 bytes");
+        kani::assert(
+            ED25519_PUBKEY_LEN == 32,
+            "Ed25519 public key must be 32 bytes",
+        );
     }
 
     /// Ed25519 signature size is always 64 bytes.
@@ -379,4 +384,3 @@ mod kani_proofs {
         kani::assert(BLAKE3_OUTPUT_LEN == 32, "Blake3 hash must be 32 bytes");
     }
 }
-

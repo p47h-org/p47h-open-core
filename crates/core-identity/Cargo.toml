@@ -10,24 +10,30 @@ description = "Identity management and DID resolution for P47H"
 keywords = ["crypto", "ed25519", "identity", "did"]
 categories = ["cryptography", "no-std"]
 
+[features]
+default = ["std"]
+std = ["secrecy"]
+
 [dependencies]
 # --- CRYPTOGRAPHY ---
 ed25519-dalek = { workspace = true, features = ["alloc", "zeroize"] }
-rand_core = { workspace = true } 
+rand_core = { workspace = true }
 zeroize = { workspace = true }
 blake3 = { workspace = true }
-rand = { workspace = true }
-getrandom = { version = "0.2", features = ["js"] } # WASM support 
 
 # --- SERIALIZATION ---
-serde = { workspace = true, features = ["derive"] }
+serde = { workspace = true, features = ["derive", "alloc"] }
 
-# --- ERRORS ---
-thiserror = { workspace = true }
+# --- SECURITY (std-only) ---
+secrecy = { version = "0.8", features = ["serde"], optional = true }
 
-# --- SECURITY ---
-secrecy = { version = "0.8", features = ["serde"] }
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { version = "0.2", features = ["js"] }
+
+[lints]
+workspace = true
 
 [dev-dependencies]
+rand = "0.8.5"
 hex = { workspace = true }
 serde_json = "1.0"

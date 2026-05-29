@@ -9,6 +9,9 @@ repository.workspace = true
 description = "IPC interfaces for P47H components"
 keywords = ["ipc", "security", "authentication", "traits"]
 
+[lints]
+workspace = true
+
 [dependencies]
 thiserror = { workspace = true }
 serde = { workspace = true }

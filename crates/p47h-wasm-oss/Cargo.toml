@@ -8,6 +8,9 @@ license.workspace = true
 repository.workspace = true
 description = "Open Source WASM bindings for p47h governance engine (Apache-2.0)"
 
+[lints]
+workspace = true
+
 [lib]
 crate-type = ["cdylib", "rlib"]
 
