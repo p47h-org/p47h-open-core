@@ -11,12 +11,22 @@
 
 use crate::error::{IdentityError, Result};
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
+use zeroize::Zeroize;
 
 /// Signs messages on behalf of the Trust Anchor.
 ///
 /// Implementations:
 /// - [`Ed25519SingleSigner`]: single-key Ed25519 (current production path)
 /// - `FrostThresholdSigner` (H1): t-of-n threshold signing via FROST-Ed25519
+///
+/// # Limitations
+///
+/// This trait assumes synchronous, single-call signing. FROST threshold
+/// signing is an interactive multi-round protocol that cannot be expressed
+/// as a simple `sign(&self, message) -> Signature` call. The H1
+/// implementation will require a redesigned async/stateful signing API
+/// for the FROST path; this trait will remain valid for the single-key
+/// backend and for the verification side (which is identical for both).
 pub trait TrustAnchorSigner {
     /// Sign `message` and return an Ed25519-compatible signature.
     fn sign(&self, message: &[u8]) -> Result<Signature>;
@@ -45,11 +55,11 @@ impl Ed25519SingleSigner {
         Self { signing_key }
     }
 
-    /// Create from raw 32-byte seed.
-    pub fn from_seed(seed: &[u8; 32]) -> Self {
-        Self {
-            signing_key: SigningKey::from_bytes(seed),
-        }
+    /// Create from raw 32-byte seed (zeroized after key derivation).
+    pub fn from_seed(mut seed: [u8; 32]) -> Self {
+        let signing_key = SigningKey::from_bytes(&seed);
+        seed.zeroize();
+        Self { signing_key }
     }
 }
 
@@ -104,6 +114,9 @@ pub struct FrostThresholdSigner {
     pub n: u16,
 }
 
+/// **Note**: This synchronous impl is a placeholder. Real FROST signing
+/// is a multi-round interactive protocol that will require a redesigned
+/// async/stateful API in H1. See `docs/threshold-signing.md` §5.
 impl TrustAnchorSigner for FrostThresholdSigner {
     fn sign(&self, _message: &[u8]) -> Result<Signature> {
         unimplemented!("FROST threshold signing not yet implemented (planned for H1)")
@@ -120,7 +133,7 @@ mod tests {
 
     #[test]
     fn test_ed25519_single_roundtrip() {
-        let signer = Ed25519SingleSigner::from_seed(&[42u8; 32]);
+        let signer = Ed25519SingleSigner::from_seed([42u8; 32]);
         let message = b"policy data to sign";
         let signature = signer.sign(message).unwrap();
 
@@ -130,7 +143,7 @@ mod tests {
 
     #[test]
     fn test_ed25519_rejects_wrong_message() {
-        let signer = Ed25519SingleSigner::from_seed(&[42u8; 32]);
+        let signer = Ed25519SingleSigner::from_seed([42u8; 32]);
         let signature = signer.sign(b"correct message").unwrap();
 
         let verifier = Ed25519Verifier::new(signer.verifying_key());
@@ -139,10 +152,10 @@ mod tests {
 
     #[test]
     fn test_ed25519_rejects_wrong_key() {
-        let signer = Ed25519SingleSigner::from_seed(&[42u8; 32]);
+        let signer = Ed25519SingleSigner::from_seed([42u8; 32]);
         let signature = signer.sign(b"message").unwrap();
 
-        let other = Ed25519SingleSigner::from_seed(&[99u8; 32]);
+        let other = Ed25519SingleSigner::from_seed([99u8; 32]);
         let verifier = Ed25519Verifier::new(other.verifying_key());
         assert!(verifier.verify(b"message", &signature).is_err());
     }
