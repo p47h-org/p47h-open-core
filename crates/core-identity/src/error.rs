@@ -1,19 +1,32 @@
-use thiserror::Error;
+use alloc::string::String;
+use core::fmt;
 
 /// Specific errors for cryptographic identity operations
-#[derive(Error, Debug)]
+#[derive(Debug)]
 pub enum IdentityError {
-    #[error("Error generating identity: {0}")]
+    #[allow(dead_code)]
     Generation(String),
 
-    #[error("Invalid signature")]
     InvalidSignature,
 
-    #[error("Invalid public key")]
     InvalidPublicKey,
 
-    #[error("Invalid key: {0}")]
+    #[allow(dead_code)]
     InvalidKey(String),
 }
+
+impl fmt::Display for IdentityError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Generation(msg) => write!(f, "Error generating identity: {msg}"),
+            Self::InvalidSignature => write!(f, "Invalid signature"),
+            Self::InvalidPublicKey => write!(f, "Invalid public key"),
+            Self::InvalidKey(msg) => write!(f, "Invalid key: {msg}"),
+        }
+    }
+}
+
+impl core::error::Error for IdentityError {}
+
 /// Specific Result type for identity operations
-pub type Result<T> = std::result::Result<T, IdentityError>;
+pub type Result<T> = core::result::Result<T, IdentityError>;

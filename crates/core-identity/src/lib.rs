@@ -13,7 +13,7 @@
 //! - **Ed25519 Signatures**: NIST-compliant digital signatures
 //! - **Memory Safety**: Automatic zeroization of private keys
 //! - **Blake3 Hashing**: Fast public key hashing for lookups
-//! - **libp2p Integration**: Seamless conversion to libp2p keypairs
+//! - **no_std compatible**: Works on embedded targets with `alloc`
 //!
 //! ## Example
 //!
@@ -36,15 +36,20 @@
 //! # }
 //! ```
 
+#![no_std]
+extern crate alloc;
+
 mod error;
 pub mod hash;
 
 pub use error::{IdentityError, Result};
 
 use ed25519_dalek::{Signature, Signer, SigningKey, Verifier, VerifyingKey};
-use secrecy::Secret;
 use serde::{Deserialize, Serialize};
 use zeroize::ZeroizeOnDrop;
+
+#[cfg(feature = "std")]
+use {alloc::vec::Vec, secrecy::Secret};
 
 use rand_core::{CryptoRng, RngCore};
 
@@ -213,16 +218,7 @@ impl Identity {
     /// - Will not appear in logs automatically
     /// - Requires explicit `.expose_secret()` to access
     ///
-    /// Should only be used for:
-    /// - Secure serialization (encrypted keystore)
-    /// - Conversion to libp2p keypair
-    /// - Low-level cryptographic operations
-    ///
-    /// WARNING: Use `.expose_secret()` only when absolutely necessary.
-    /// The exposed bytes should be:
-    /// - Encrypted immediately if stored
-    /// - Zeroized after use
-    /// - Never logged or transmitted unencrypted
+    /// Only available with the `std` feature (default).
     ///
     /// # Example
     ///
@@ -243,6 +239,7 @@ impl Identity {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "std")]
     pub fn signing_key_bytes(&self) -> Secret<Vec<u8>> {
         Secret::new(self.keypair.to_bytes().to_vec())
     }
