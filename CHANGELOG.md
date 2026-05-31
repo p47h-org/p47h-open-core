@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.11.1] - 2026-05-31
+
+### Fixed
+
+- **core-policy**: Corrected crates.io category from `no-std::no-alloc` to `no-std`.
+  The crate uses `extern crate alloc` (Vec, String, BTreeMap) and was never no-alloc.
+
+### Changed
+
+- **all crates**: Replaced placeholder READMEs with proper documentation
+  (description, no_std notes, links to repo and security policy).
+
 ## [0.11.0] - 2026-05-31
 
 ### Changed

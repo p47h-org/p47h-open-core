@@ -8,7 +8,7 @@ license.workspace = true
 repository.workspace = true
 description = "Pure RBAC/ABAC policy engine core (zero crypto/network dependencies)"
 keywords = ["rbac", "abac", "authorization", "policy", "access-control"]
-categories = ["authentication", "no-std::no-alloc"]
+categories = ["authentication", "no-std"]
 readme = "README.md"
 documentation = "https://docs.rs/core-policy"
 
