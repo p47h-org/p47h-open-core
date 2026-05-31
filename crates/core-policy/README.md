@@ -1,13 +1,28 @@
 # core-policy
 
-Pure RBAC/ABAC policy engine core with zero crypto/network dependencies.
+Pure RBAC/ABAC policy engine with zero crypto or network dependencies.
 
-Wildcard path matching, context expressions, and policy authorization.
+Evaluates access-control decisions using wildcard path matching, context expressions (`role == "admin" || role == "auditor"`), and composable policy rules. Designed for edge enforcement where latency matters.
 
-## Features
+## `no_std` support
 
-- **`toml`** — enables `Policy::from_toml()` / `Policy::to_toml()` (requires std)
-- Without `toml`: genuine `#![no_std]`, builds for `thumbv7em-none-eabi`
+This crate is `#![no_std]` compatible **with `alloc`** (uses `Vec`, `String`, `BTreeMap`). Verified on `thumbv7em-none-eabi`.
+
+The optional `toml` feature enables `Policy::from_toml()` / `Policy::to_toml()` and requires `std`:
+
+```toml
+# no_std (with alloc):
+core-policy = "0.11"
+
+# With TOML serialization (requires std):
+core-policy = { version = "0.11", features = ["toml"] }
+```
+
+## Links
+
+- [Repository](https://github.com/p47h-org/p47h-open-core)
+- [Security policy](https://github.com/p47h-org/p47h-open-core/blob/main/.github/SECURITY.md)
+- [API docs](https://docs.rs/core-policy)
 
 ## License
 
