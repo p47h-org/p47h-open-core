@@ -9,6 +9,8 @@ repository.workspace = true
 description = "Identity management and DID resolution for P47H"
 keywords = ["crypto", "ed25519", "identity", "did"]
 categories = ["cryptography", "no-std"]
+readme = "README.md"
+documentation = "https://docs.rs/core-identity"
 
 [features]
 default = ["std"]

@@ -7,6 +7,10 @@ authors.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Open Source WASM bindings for p47h governance engine (Apache-2.0)"
+keywords = ["wasm", "governance", "identity", "policy"]
+categories = ["wasm", "cryptography"]
+readme = "README.md"
+documentation = "https://docs.rs/p47h-wasm-oss"
 
 [lints]
 workspace = true
