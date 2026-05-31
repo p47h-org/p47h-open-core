@@ -8,85 +8,54 @@ Last updated: 2026-05-31
 |------|--------|---------|
 | 1.1 Diagnostico real | ✅ | Grafo verificado, versiones mapeadas |
 | 1.2 Fechas CHANGELOG | ✅ | 0.10.2 = 2026-05-29 (fecha real del merge a origin/main) |
-| 1.3 Decision FROST | ✅ | NO se mergea como driver de version. Rama viva sin version propia |
-| 1.4 Consolidar fix no_std | ✅ | Rebase sobre main 0.10.2, 4 verificaciones en verde |
-| 1.5 CHECKPOINT | 🟡 | Esperando OK humano |
-
-### Verificaciones Fase 1
-
-| Verificacion | Resultado |
-|---|---|
-| `cargo test --workspace --features toml` | ✅ Todos pasan, 0 failed |
-| `cargo check -p core-policy --target thumbv7em-none-eabi` | ✅ Compila sin flags extra |
-| `cargo check -p core-identity --target thumbv7em-none-eabi --no-default-features` | ✅ Compila |
-| `cargo build -p p47h-engine --target wasm32-unknown-unknown` | ✅ Compila |
+| 1.3 Decision FROST | ✅ | NO se mergea como driver de version |
+| 1.4 Consolidar fix no_std | ✅ | Merged a main via PR#3 (304c1eb) |
+| 1.5 CHECKPOINT | ✅ | Aprobado por humano |
 
 ## Fase 2 — Bump a 0.11.0 y verificacion pre-publicacion
 
 | Paso | Estado | Detalle |
 |------|--------|---------|
-| 2.1 Bump workspace a 0.11.0 | ⛔ | Pendiente OK Fase 1 |
-| 2.2 CHANGELOG 0.11.0 | 🟡 | Seccion [Unreleased] preparada, se fija en bump |
-| 2.3 Higiene crates.io | ⛔ | Pendiente |
-| 2.4 CHECKPOINT critico | ⛔ | Pendiente |
+| 2.1 Bump workspace a 0.11.0 | ✅ | Todas las versiones en 0.11.0 |
+| 2.2 CHANGELOG 0.11.0 | ✅ | Seccion fijada con fecha 2026-05-31 |
+| 2.3 Higiene crates.io | ✅ | READMEs, categories, keywords, documentation |
+| 2.3a frost.rs eliminado | ✅ | Archivo commiteado por error, eliminado |
+| 2.4 Dry-runs | 🟡 | core-identity ✅, core-policy ✅, p47h-engine/wasm-oss: packaging OK pero verificacion falla (esperado: deps no publicadas aun) |
+| 2.5 CHECKPOINT CRITICO | 🟡 | Esperando OK humano |
 
-## Fase 3 — Pro consume 0.11.0 desde crates.io
+### Verificaciones (todas sobre 0.11.0)
 
-| Paso | Estado | Detalle |
-|------|--------|---------|
-| 3.1 Actualizar Cargo.toml de Pro | ⛔ | Requiere publicacion real en crates.io |
-| 3.2 Verificar compilacion Pro | ⛔ | Pendiente |
-| 3.3 CHECKPOINT | ⛔ | Pendiente |
-
-## Fase 4 — Contratos tipados (ts-rs)
-
-| Paso | Estado | Detalle |
-|------|--------|---------|
-| 4.1 Barrido handlers untyped | ⛔ | Pendiente |
-| 4.2 Convertir a structs tipados | ⛔ | Pendiente |
-| 4.3 Implementar ts-export | ⛔ | Pendiente |
-| 4.4 Migrar frontend | ⛔ | Pendiente |
-| 4.5 CHECKPOINT | ⛔ | Pendiente |
-
-## Fase 5 — Features MUST del frontend
-
-| Feature | Estado | Detalle |
-|---------|--------|---------|
-| a) Gestion de roles (CRUD) | ⛔ | Pendiente |
-| b) Emision de tokens p47h-agent | ⛔ | Pendiente |
-| c) Rotacion de clave admin | ⛔ | Pendiente |
-| d) Revocacion de DIDs | ⛔ | Pendiente |
-
-## Fase 6 — Paquete de despliegue MVP
-
-| Paso | Estado | Detalle |
-|------|--------|---------|
-| 6.1 docker-compose.yml | ⛔ | Pendiente |
-| 6.2 Dockerfile multi-stage | ⛔ | Pendiente |
-| 6.3 Build reproducible | ⛔ | Pendiente |
-| 6.4 Firma cosign | ⛔ | Pendiente |
-| 6.5 Binario p47h-agent | ⛔ | Pendiente |
-| 6.6 CHECKPOINT | ⛔ | Pendiente |
-
-## Fase 7 — Docs despliegue
-
-| Paso | Estado | Detalle |
-|------|--------|---------|
-| 7.1 quickstart.md | ⛔ | Pendiente |
-| 7.2 bootstrap.md | ⛔ | Pendiente |
-| 7.3 runbook.md | ⛔ | Pendiente |
-| 7.4 CHECKPOINT | ⛔ | Pendiente |
+| Verificacion | Resultado |
+|---|---|
+| `cargo test --workspace --features toml` | ✅ 0 failed |
+| `cargo check -p core-policy --target thumbv7em-none-eabi` | ✅ v0.11.0 |
+| `cargo check -p core-identity --target thumbv7em-none-eabi --no-default-features` | ✅ v0.11.0 |
+| `cargo build -p p47h-engine --target wasm32-unknown-unknown` | ✅ v0.11.0 |
+| `cargo publish -p core-identity --dry-run` | ✅ packaged + verified |
+| `cargo publish -p core-policy --dry-run` | ✅ packaged + verified |
+| `cargo publish -p p47h-engine --dry-run` | ⚠️ packaging OK, verify fails (needs core-identity 0.11.0 on crates.io first) |
+| `cargo publish -p p47h-wasm-oss --dry-run` | ⚠️ packaging OK, verify fails (needs p47h-engine 0.11.0 on crates.io first) |
 
 ## Comandos que requieren ejecucion humana
 
 ```bash
-# Fase 2 — tras checkpoint aprobado
-git push origin main && git push origin v0.11.0
+# 1. Commit y merge del release branch
+git add -A && git commit -s -m "chore: release v0.11.0 ..."
+# merge to main via PR o directo
+
+# 2. Tag
+git tag -s v0.11.0 -m "v0.11.0: genuine no_std for core-policy, honest metadata"
+
+# 3. Push
+git push origin main
+git push origin v0.11.0
+
+# 4. Publicar en ORDEN DE DEPENDENCIAS (esperar ~30s entre cada uno)
 cargo publish -p core-identity
 cargo publish -p core-policy
 cargo publish -p p47h-engine
-gh release create v0.11.0 ...
+cargo publish -p p47h-wasm-oss   # si se publica
 
-# Fase 6 — firma de imagenes
-cosign sign --key cosign.key <image-digest>
+# 5. GitHub Release
+gh release create v0.11.0 --title "v0.11.0" --notes-from-tag
 ```
