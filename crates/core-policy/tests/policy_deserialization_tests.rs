@@ -1,11 +1,11 @@
 //! Tests for forced validation during Policy deserialization
 
-use core_policy::{Policy, PolicyError, MAX_POLICY_NAME_LENGTH, MAX_RULES_PER_POLICY};
+use core_policy::{Policy, MAX_POLICY_NAME_LENGTH, MAX_RULES_PER_POLICY};
 
 #[test]
 fn test_deserialize_policy_with_too_many_rules() {
     // Create a TOML with more than MAX_RULES_PER_POLICY rules
-    let mut toml = String::from(
+    let mut toml_str = String::from(
         r#"
 name = "test-policy"
 version = 1
@@ -16,7 +16,7 @@ valid_until = 2000000000
 
     // Add MAX_RULES_PER_POLICY + 1 rules
     for i in 0..=MAX_RULES_PER_POLICY {
-        toml.push_str(&format!(
+        toml_str.push_str(&format!(
             r#"
 [[rules]]
 peer_id = "peer{}"
@@ -27,36 +27,30 @@ resource = {{ File = "/test" }}
         ));
     }
 
-    // Attempt to deserialize - should fail with TomlError containing TooManyRules message
-    let result = Policy::from_toml(&toml);
+    // Attempt to deserialize - should fail with TooManyRules wrapped in toml error
+    let result = toml::from_str::<Policy>(&toml_str);
 
     assert!(result.is_err(), "Expected error but got Ok");
-    let err = result.unwrap_err();
+    let msg = result.unwrap_err().to_string();
 
-    // The error is wrapped in TomlError by serde, but contains our PolicyError message
-    match err {
-        PolicyError::TomlError(e) => {
-            let msg = e.to_string();
-            assert!(
-                msg.contains("1024"),
-                "Error should mention max of 1024: {}",
-                msg
-            );
-            assert!(
-                msg.contains("1025"),
-                "Error should mention attempted 1025: {}",
-                msg
-            );
-        }
-        other => panic!("Expected TomlError wrapping TooManyRules, got: {:?}", other),
-    }
+    // The PolicyError message is embedded in the toml::de::Error string
+    assert!(
+        msg.contains("1024"),
+        "Error should mention max of 1024: {}",
+        msg
+    );
+    assert!(
+        msg.contains("1025"),
+        "Error should mention attempted 1025: {}",
+        msg
+    );
 }
 
 #[test]
 fn test_deserialize_policy_with_too_long_name() {
     // Create a TOML with a name longer than MAX_POLICY_NAME_LENGTH
     let long_name = "a".repeat(MAX_POLICY_NAME_LENGTH + 1);
-    let toml = format!(
+    let toml_str = format!(
         r#"
 name = "{}"
 version = 1
@@ -71,28 +65,20 @@ resource = {{ File = "/test" }}
         long_name
     );
 
-    // Attempt to deserialize - should fail with TomlError containing NameTooLong message
-    let result = Policy::from_toml(&toml);
+    let result = toml::from_str::<Policy>(&toml_str);
 
     assert!(result.is_err(), "Expected error but got Ok");
-    let err = result.unwrap_err();
-
-    match err {
-        PolicyError::TomlError(e) => {
-            let msg = e.to_string();
-            assert!(
-                msg.contains("128") || msg.contains("name"),
-                "Error should mention name length limit: {}",
-                msg
-            );
-        }
-        other => panic!("Expected TomlError wrapping NameTooLong, got: {:?}", other),
-    }
+    let msg = result.unwrap_err().to_string();
+    assert!(
+        msg.contains("128") || msg.contains("name"),
+        "Error should mention name length limit: {}",
+        msg
+    );
 }
 
 #[test]
 fn test_deserialize_valid_policy() {
-    let toml = r#"
+    let toml_str = r#"
 name = "valid-policy"
 version = 1
 issued_at = 0
@@ -109,7 +95,7 @@ action = "Write"
 resource = { File = "/logs/*" }
 "#;
 
-    let policy = Policy::from_toml(toml).unwrap();
+    let policy = toml::from_str::<Policy>(toml_str).unwrap();
     assert_eq!(policy.name(), "valid-policy");
     assert_eq!(policy.rules().len(), 2);
     assert_eq!(policy.version(), 1);
@@ -117,7 +103,7 @@ resource = { File = "/logs/*" }
 
 #[test]
 fn test_deserialize_policy_with_empty_name() {
-    let toml = r#"
+    let toml_str = r#"
 name = ""
 version = 1
 issued_at = 0
@@ -129,49 +115,35 @@ action = "Read"
 resource = { File = "/test" }
 "#;
 
-    // Should fail validation due to empty name
-    let result = Policy::from_toml(toml);
+    let result = toml::from_str::<Policy>(toml_str);
     assert!(result.is_err(), "Expected error but got Ok");
 
-    let err = result.unwrap_err();
-    match err {
-        PolicyError::TomlError(e) => {
-            let msg = e.to_string();
-            assert!(
-                msg.contains("empty") || msg.contains("name"),
-                "Error should mention empty name: {}",
-                msg
-            );
-        }
-        other => panic!("Expected TomlError wrapping InvalidRule, got: {:?}", other),
-    }
+    let msg = result.unwrap_err().to_string();
+    assert!(
+        msg.contains("empty") || msg.contains("name"),
+        "Error should mention empty name: {}",
+        msg
+    );
 }
 
 #[test]
 fn test_deserialize_policy_with_no_rules() {
-    let toml = r#"
+    let toml_str = r#"
 name = "no-rules-policy"
 version = 1
 issued_at = 0
 valid_until = 2000000000
 "#;
 
-    // Should fail validation due to no rules
-    let result = Policy::from_toml(toml);
+    let result = toml::from_str::<Policy>(toml_str);
     assert!(result.is_err(), "Expected error but got Ok");
 
-    let err = result.unwrap_err();
-    match err {
-        PolicyError::TomlError(e) => {
-            let msg = e.to_string();
-            assert!(
-                msg.contains("rule") || msg.contains("at least one"),
-                "Error should mention missing rules: {}",
-                msg
-            );
-        }
-        other => panic!("Expected TomlError wrapping InvalidRule, got: {:?}", other),
-    }
+    let msg = result.unwrap_err().to_string();
+    assert!(
+        msg.contains("rule") || msg.contains("at least one"),
+        "Error should mention missing rules: {}",
+        msg
+    );
 }
 
 #[test]
@@ -190,10 +162,10 @@ fn test_serialize_then_deserialize_roundtrip() {
         .with_metadata("owner", "admin");
 
     // Serialize to TOML
-    let toml = policy.to_toml().unwrap();
+    let toml_str = toml::to_string(&policy).unwrap();
 
     // Deserialize back
-    let deserialized = Policy::from_toml(&toml).unwrap();
+    let deserialized = toml::from_str::<Policy>(&toml_str).unwrap();
 
     // Verify all fields match
     assert_eq!(deserialized.name(), policy.name());

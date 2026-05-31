@@ -107,6 +107,20 @@ jobs:
             exit 1
           fi
 
+  nostd-check:
+    name: no_std Compliance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: thumbv7em-none-eabi
+
+      - name: Check core-policy compiles as no_std (no default features)
+        run: cargo check -p core-policy --target thumbv7em-none-eabi
+
   build:
     name: Build
     runs-on: ${{ matrix.os }}

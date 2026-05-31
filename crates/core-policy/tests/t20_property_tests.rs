@@ -40,7 +40,7 @@ resource = {{ File = "/test" }}
             name
         );
 
-        let result = Policy::from_toml(&toml);
+        let result = toml::from_str::<Policy>(&toml);
         prop_assert!(result.is_ok(), "Valid policy name '{}' should deserialize: {:?}", name, result);
         let policy = result.unwrap();
         prop_assert_eq!(policy.name(), &name);
@@ -68,7 +68,7 @@ resource = {{ File = "/test" }}
             name
         );
 
-        let result = Policy::from_toml(&toml);
+        let result = toml::from_str::<Policy>(&toml);
         prop_assert!(result.is_ok(), "Max-length name ({} chars) should be valid: {:?}", name.len(), result);
     }
 
@@ -92,7 +92,7 @@ resource = {{ File = "/test" }}
             name
         );
 
-        let result = Policy::from_toml(&toml);
+        let result = toml::from_str::<Policy>(&toml);
         prop_assert!(result.is_err(), "Name with {} chars (>{}) must be rejected", name.len(), MAX_POLICY_NAME_LENGTH);
     }
 
@@ -120,7 +120,7 @@ resource = {{ File = "/test/{}" }}
             ));
         }
 
-        let result = Policy::from_toml(&toml);
+        let result = toml::from_str::<Policy>(&toml);
         prop_assert!(result.is_ok(), "Policy with {} rules should deserialize: {:?}", rule_count, result);
         prop_assert_eq!(result.unwrap().rules().len(), rule_count);
     }
@@ -151,7 +151,7 @@ resource = {{ File = "/test" }}
             ));
         }
 
-        let result = Policy::from_toml(&toml);
+        let result = toml::from_str::<Policy>(&toml);
         prop_assert!(result.is_err(), "Policy with {} rules (>{}) must be rejected", rule_count, MAX_RULES_PER_POLICY);
     }
 
@@ -183,7 +183,7 @@ resource = {{ File = "/path/{}" }}
             ));
         }
 
-        let result = Policy::from_toml(&toml);
+        let result = toml::from_str::<Policy>(&toml);
         if let Ok(policy) = result {
             prop_assert!(policy.validate().is_ok(), "Deserialized policy must pass validate()");
         }
@@ -211,8 +211,8 @@ resource = {{ File = "/path/{}" }}
         }
 
         // Roundtrip
-        let toml = policy.to_toml().unwrap();
-        let deserialized = Policy::from_toml(&toml);
+        let toml = toml::to_string(&policy).unwrap();
+        let deserialized = toml::from_str::<Policy>(&toml);
 
         prop_assert!(deserialized.is_ok(), "Roundtrip should preserve validity: {:?}", deserialized);
         let p2 = deserialized.unwrap();
@@ -243,7 +243,7 @@ resource = {{ File = "/test" }}
 "#,
         name
     );
-    assert!(Policy::from_toml(&toml).is_ok());
+    assert!(toml::from_str::<Policy>(&toml).is_ok());
 }
 
 #[test]
@@ -264,7 +264,7 @@ resource = {{ File = "/test" }}
 "#,
         name
     );
-    assert!(Policy::from_toml(&toml).is_ok());
+    assert!(toml::from_str::<Policy>(&toml).is_ok());
 }
 
 #[test]
@@ -285,7 +285,7 @@ resource = {{ File = "/test" }}
 "#,
         name
     );
-    assert!(Policy::from_toml(&toml).is_err());
+    assert!(toml::from_str::<Policy>(&toml).is_err());
 }
 
 #[test]
@@ -297,7 +297,7 @@ version = 1
 issued_at = 0
 valid_until = 2000000000
 "#;
-    assert!(Policy::from_toml(toml).is_err());
+    assert!(toml::from_str::<Policy>(toml).is_err());
 }
 
 #[test]
@@ -314,5 +314,5 @@ peer_id = "alice"
 action = "Read"
 resource = { File = "/test" }
 "#;
-    assert!(Policy::from_toml(toml).is_ok());
+    assert!(toml::from_str::<Policy>(toml).is_ok());
 }

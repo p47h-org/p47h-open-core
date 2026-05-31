@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased] — targeting 0.11.0
+
+### Changed
+
+- **core-policy** [BREAKING]: `toml` dependency is now behind an optional `toml` feature flag.
+  Crates that call `Policy::from_toml()` / `Policy::to_toml()` must enable `core-policy/toml`.
+  Without the feature, `core-policy` is genuine `no_std` (verified on `thumbv7em-none-eabi`).
+- **p47h-engine**: Added `features = ["toml"]` to `core-policy` dependency (no API change).
+- **CI**: Added `nostd-check` job that verifies `core-policy` compiles on `thumbv7em-none-eabi`.
+
+### Fixed
+
+- **core-policy**: `#![no_std]` was dishonest — the unconditional `toml` dependency requires `std`.
+  Now correctly feature-gated so the crate is genuinely `no_std`-compatible when `toml` is disabled.
+
+### Migration guide
+
+Users of `Policy::from_toml()` / `Policy::to_toml()`:
+```toml
+# Before (0.10.x)
+core-policy = "0.10"
+
+# After (0.11.0)
+core-policy = { version = "0.11", features = ["toml"] }
+```
+
 ## [0.10.2] - 2026-05-29
 
 ### Security
