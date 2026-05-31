@@ -13,7 +13,7 @@ crate-type = ["rlib"]
 
 [dependencies]
 # --- WORKSPACE CRATES ---
-core-policy = { workspace = true }
+core-policy = { workspace = true, features = ["toml"] }
 core-identity = { workspace = true }
 
 

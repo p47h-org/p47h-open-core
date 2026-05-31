@@ -578,11 +578,14 @@ impl Policy {
 
     /// Load policy from TOML string
     ///
+    /// Requires the `toml` feature.
+    ///
     /// # Errors
     ///
     /// Returns an error if:
     /// - TOML parsing fails
     /// - Validation fails (see `validate()`)
+    #[cfg(feature = "toml")]
     pub fn from_toml(toml_str: &str) -> Result<Self> {
         let policy: Self = toml::from_str(toml_str)?;
         policy.validate()?;
@@ -591,9 +594,12 @@ impl Policy {
 
     /// Serialize policy to TOML string
     ///
+    /// Requires the `toml` feature.
+    ///
     /// # Errors
     ///
     /// Returns `PolicyError::SerializationError` if TOML serialization fails
+    #[cfg(feature = "toml")]
     pub fn to_toml(&self) -> Result<String> {
         toml::to_string(self).map_err(|e| PolicyError::SerializationError(e.to_string()))
     }

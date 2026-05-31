@@ -13,7 +13,7 @@ categories = ["authentication", "cryptography"]
 [dependencies]
 # Serialization
 serde = { workspace = true, features = ["derive"] }
-toml = { workspace = true, default-features = false, features = ["parse", "display"] }
+toml = { workspace = true, default-features = false, features = ["parse", "display"], optional = true }
 
 # Error handling
 # thiserror = { workspace = true }
@@ -25,6 +25,7 @@ workspace = true
 # Testing
 proptest = "1.0"
 criterion = "0.5"
+toml = { workspace = true, default-features = false, features = ["parse", "display"] }
 
 [[bench]]
 name = "policy_bench"
@@ -36,3 +37,7 @@ harness = false
 
 [features]
 default = []
+## Enables `Policy::from_toml()` / `Policy::to_toml()` convenience methods.
+## Pulls in the `toml` crate which requires std. Without this feature,
+## core-policy is genuinely #![no_std] and compiles for embedded targets.
+toml = ["dep:toml"]

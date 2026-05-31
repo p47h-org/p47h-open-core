@@ -29,7 +29,8 @@ pub enum PolicyError {
     /// Serialization error
     SerializationError(String),
 
-    /// TOML parsing error
+    /// TOML parsing error (requires `toml` feature)
+    #[cfg(feature = "toml")]
     TomlError(toml::de::Error),
 
     /// IO error
@@ -96,6 +97,7 @@ impl fmt::Display for PolicyError {
             }
             Self::InvalidPeerId(msg) => write!(f, "Invalid peer ID: {}", msg),
             Self::SerializationError(msg) => write!(f, "Serialization error: {}", msg),
+            #[cfg(feature = "toml")]
             Self::TomlError(e) => write!(f, "TOML parsing error: {}", e),
             Self::TooManyRules { max, attempted } => write!(
                 f,
@@ -128,6 +130,7 @@ impl fmt::Display for PolicyError {
     }
 }
 
+#[cfg(feature = "toml")]
 impl From<toml::de::Error> for PolicyError {
     fn from(err: toml::de::Error) -> Self {
         Self::TomlError(err)
