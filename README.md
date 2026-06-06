@@ -23,13 +23,33 @@ This crate provides the low-level Rust implementation of the vault encryption lo
 
 ---
 
+## Where this fits: Vault (local, OSS) vs Pro (distributed, roadmap)
+
+P47H has two layers, and this distinction is load-bearing for what the code actually guarantees:
+
+- **Vault — the local layer (this repo, open-source, present tense).** Single-device,
+  single-identity cryptography: encrypted local storage, a cryptographic identity (DID),
+  local signing, and a **stateless** policy *evaluation* engine. Everything here runs on
+  one device and trusts no authority. This is what exists today.
+- **Pro — the distributed layer (roadmap, NOT in this repo).** A Trust Anchor that signs
+  policy and roles, signed policy distribution, partition-tolerant convergence across
+  nodes, and a mergeable cross-node audit chain. These are **not** provided by this crate
+  and are **not** present-tense capabilities — they are roadmap.
+
+The honest line: a local signature or policy decision in this layer proves *"this key
+acted"*, **not** *"an authority sanctioned it"* — the latter needs the Pro Trust Anchor
+layer. See [`docs/THREAT_MODEL.md`](./docs/THREAT_MODEL.md) for exactly what the local
+layer defends against today and what it does not.
+
+---
+
 ## Usage Warning
 
 This is a **low-level core library**.
 
 If you are a web developer looking to implement secure storage in your application, use the high-level SDK:
 
-**[@p47h/vault](https://www.npmjs.com/package/@p47h/vault)**
+**[@p47h/vault-js](https://www.npmjs.com/package/@p47h/vault-js)** — or **[@p47h/vault-react](https://www.npmjs.com/package/@p47h/vault-react)** for React.
 
 Direct usage of this crate is recommended only for:
 
@@ -82,7 +102,7 @@ Layer 3: Engine & Adapters
 ### Native Build
 
 ```bash
-git clone [https://github.com/p47h-org/p47h-open-core](https://github.com/p47h-org/p47h-open-core)
+git clone https://github.com/p47h-org/p47h-open-core
 cd p47h-open-core
 cargo build --release --workspace
 
@@ -180,13 +200,13 @@ Do not open public issues for security vulnerabilities. We acknowledge reports w
 
 All contributors must sign the Contributor License Agreement (CLA) before their PR can be merged.
 
-See [CONTRIBUTING.md](https://www.google.com/search?q=./CONTRIBUTING.md) for details.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
 
 ---
 
 ## License
 
-Apache License 2.0. See [LICENSE](https://www.google.com/search?q=./LICENSE) for full terms.
+Apache License 2.0. See [LICENSE](./LICENSE) for full terms.
 
 ---
 

@@ -4,8 +4,11 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.10.x  | :white_check_mark: |
-| < 0.10  | :x:                |
+| 0.11.x  | :white_check_mark: |
+| < 0.11  | :x:                |
+
+For what the local layer defends against (and what it does not), see
+[`docs/THREAT_MODEL.md`](../docs/THREAT_MODEL.md).
 
 ## Reporting a Vulnerability
 
